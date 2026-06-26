@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monkey Shop - ระบบสมาชิก</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background-color: #FFDE3B; 
+            background-image: radial-gradient(#F5B000 1px, transparent 1px);
+            background-size: 20px 20px;
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        
+        .container { 
+            background: #FFFFFF; 
+            padding: 30px 25px; 
+            border-radius: 24px; 
+            border: 5px solid #F5A623; 
+            box-shadow: 0 12px 0px rgba(245, 166, 35, 0.3), 0 15px 25px rgba(0,0,0,0.15); 
+            max-width: 550px; 
+            width: 100%; 
+            text-align: center; 
+            position: relative;
+        }
+
+        h1 { 
+            color: #5D3A1A; margin-bottom: 5px; font-size: 32px; 
+            font-weight: 800; text-shadow: 2px 2px 0px #FFDE3B; 
+        }
+        p { color: #5D3A1A; font-size: 16px; line-height: 1.5; font-weight: 600; margin-top: 5px; }
+        hr { border: 0; border-top: 3px dashed #F5A623; margin: 20px 0; }
+
+        .text-link { color: #E65100; cursor: pointer; text-decoration: underline; font-weight: 800; }
+        .text-link:hover { color: #5D3A1A; }
+
+        /* --- ส่วนหัวของหน้าสินค้า --- */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .user-greeting { font-size: 14px; color: #E65100; font-weight: 800; background: #FFF3E0; padding: 5px 15px; border-radius: 20px; border: 2px solid #FFC107;}
+        .logout-btn { font-size: 14px; background: transparent; border: none; color: #D32F2F; cursor: pointer; font-weight: 800; text-decoration: underline; font-family: 'Kanit';}
+
+        /* --- อัปเกรด: ระบบตารางสำหรับสินค้าจำนวนมาก --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+            max-height: 50vh; /* เผื่อจอเล็กให้เลื่อนได้ */
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        /* แต่งแถบเลื่อน (Scrollbar) ให้สวยงาม */
+        .product-grid::-webkit-scrollbar { width: 8px; }
+        .product-grid::-webkit-scrollbar-track { background: #FFF3E0; border-radius: 10px; }
+        .product-grid::-webkit-scrollbar-thumb { background: #FFC107; border-radius: 10px; }
+
+        .product-card {
+            background: #FFF3E0; border: 3px solid #FF9800; border-radius: 16px;
+            padding: 15px 10px; transition: 0.3s;
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+        }
+        .product-card:hover { transform: scale(1.03); box-shadow: 0 5px 15px rgba(230, 81, 0, 0.2); border-color: #E65100; }
+        
+        .product-card h3 { margin: 0; color: #5D3A1A; font-size: 18px; }
+        .product-card .price { font-size: 22px; color: #E65100; font-weight: 800; margin: 10px 0; }
+        
+        /* ไฮไลท์แพ็กเกจตลอดชีพ */
+        .product-card.lifetime {
+            grid-column: span 2; /* กินพื้นที่ 2 ช่อง */
+            background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+            border: 4px solid #FFC107;
+        }
+        .product-card.lifetime h3 { color: #E65100; font-size: 22px; }
+
+        .buy-btn {
+            background: #FFC107; color: #5D3A1A; border: 2px solid #E65100; padding: 8px 15px;
+            border-radius: 20px; font-family: 'Kanit'; font-weight: 800; cursor: pointer;
+            box-shadow: 0 4px 0px #E65100; transition: 0.2s; width: 90%;
+        }
+        .buy-btn:hover { transform: translateY(2px); box-shadow: 0 2px 0px #E65100; }
+
+        /* --- สไตล์ฟอร์มและปุ่มยืนยัน --- */
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; color: #5D3A1A; font-weight: 800; margin-bottom: 5px; }
+        .input-field {
+            width: 90%; padding: 12px 15px; font-size: 16px; border: 2px solid #FFC107; 
+            border-radius: 12px; font-family: 'Kanit', sans-serif; outline: none; transition: 0.3s;
+        }
+        .input-field:focus { border-color: #E65100; box-shadow: 0 0 8px rgba(230, 81, 0, 0.2); }
+
+        .btn { 
+            background: linear-gradient(180deg, #FFC107 0%, #FF9800 100%); 
+            color: #5D3A1A; border: 3px solid #E65100; padding: 15px 30px; font-size: 20px; 
+            border-radius: 50px; cursor: pointer; transition: all 0.2s; width: 100%; 
+            font-weight: 800; margin-top: 15px; box-shadow: 0 6px 0px #E65100; font-family: 'Kanit';
+        }
+        .btn:hover { transform: translateY(4px); box-shadow: 0 2px 0px #E65100; }
+        
+        .support-img { max-width: 100%; height: auto; border-radius: 16px; margin-top: 15px; border: 3px solid #FFDE3B; }
+        .loader { border: 6px solid #FFF3E0; border-top: 6px solid #FF9800; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .back-link {
+            display: inline-block; margin-top: 25px; color: #FFF; background-color: #5D3A1A;
+            text-decoration: none; font-weight: 600; padding: 12px 25px; border-radius: 30px;
+            box-shadow: 0 4px 0px #3E2723; cursor: pointer; border: none; font-family: 'Kanit'; font-size: 16px; width: 100%;
+        }
+        .back-link:hover { transform: translateY(2px); box-shadow: 0 2px 0px #3E2723; }
+
+        .btn-back-secondary { background: transparent; color: #E65100; border: none; font-family: 'Kanit'; font-weight: 800; cursor: pointer; text-decoration: underline; margin-top: 15px; font-size: 16px; }
+
+        #register-screen, #home-screen, #checkout-screen, #success-screen { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="login-screen">
+        <h1>เข้าสู่ระบบ 🐒</h1>
+        <p>ยินดีต้อนรับกลับสู่ Monkey Shop</p>
+        <hr>
+        <div class="input-group">
+            <label>อีเมล</label>
+            <input type="email" id="loginEmail" class="input-field" placeholder="email@example.com">
+        </div>
+        <div class="input-group">
+            <label>รหัสผ่าน</label>
+            <input type="password" id="loginPassword" class="input-field" placeholder="********">
+        </div>
+        <button class="btn" onclick="processLogin()">เข้าสู่ระบบ 🚀</button>
+        <p style="margin-top: 25px;">
+            ยังไม่มีบัญชีใช่ไหม? <span class="text-link" onclick="switchScreen('register-screen')">สมัครสมาชิกเลย</span>
+        </p>
+    </div>
+
+    <div class="container" id="register-screen">
+        <h1>สมัครสมาชิก 📝</h1>
+        <p>มาร่วมเป็นครอบครัว Monkey Shop</p>
+        <hr>
+        <div class="input-group">
+            <label>ชื่อผู้ใช้งาน</label>
+            <input type="text" id="regName" class="input-field" placeholder="ชื่อของคุณ">
+        </div>
+        <div class="input-group">
+            <label>อีเมล</label>
+            <input type="email" id="regEmail" class="input-field" placeholder="email@example.com">
+        </div>
+        <div class="input-group">
+            <label>รหัสผ่าน</label>
+            <input type="password" id="regPassword" class="input-field" placeholder="ตั้งรหัสผ่าน">
+        </div>
+        <button class="btn" onclick="processRegister()">สร้างบัญชี 🌟</button>
+        <p style="margin-top: 25px;">
+            มีบัญชีอยู่แล้ว? <span class="text-link" onclick="switchScreen('login-screen')">เข้าสู่ระบบ</span>
+        </p>
+    </div>
+
+    <div class="container" id="home-screen">
+        <div class="header-top">
+            <span class="user-greeting">👤 <span id="displayUserName">ลูกค้า</span></span>
+            <button class="logout-btn" onclick="processLogout()">ออกจากระบบ</button>
+        </div>
+
+        <h1>Monkey Shop 🐒</h1>
+        <p>เลือกระยะเวลาการใช้งานที่คุณต้องการ</p>
+        <hr>
+
+        <div class="product-grid">
+            <div class="product-card"><h3>1 เดือน</h3><div class="price">49.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 1 เดือน', 49)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>2 เดือน</h3><div class="price">89.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 2 เดือน', 89)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>3 เดือน</h3><div class="price">129.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 3 เดือน', 129)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>4 เดือน</h3><div class="price">169.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 4 เดือน', 169)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>5 เดือน</h3><div class="price">199.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 5 เดือน', 199)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>6 เดือน</h3><div class="price">239.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 6 เดือน', 239)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>7 เดือน</h3><div class="price">279.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 7 เดือน', 279)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>8 เดือน</h3><div class="price">319.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 8 เดือน', 319)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>9 เดือน</h3><div class="price">359.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 9 เดือน', 359)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>10 เดือน</h3><div class="price">399.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 10 เดือน', 399)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>11 เดือน</h3><div class="price">439.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 11 เดือน', 439)">เลือกซื้อ</button></div>
+            <div class="product-card"><h3>1 ปี</h3><div class="price">499.-</div><button class="buy-btn" onclick="goToCheckout('แพ็กเกจ 1 ปี', 499)">เลือกซื้อ</button></div>
+            
+            <div class="product-card lifetime">
+                <h3>👑 ตลอดชีพ</h3>
+                <div class="price" style="font-size: 28px;">999.-</div>
+                <button class="buy-btn" style="width: 50%;" onclick="goToCheckout('แพ็กเกจ ตลอดชีพ', 999)">เลือกซื้อเลย!</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="checkout-screen">
+        <h1>ยืนยันคำสั่งซื้อ</h1>
+        <p><b id="product-name-display" style="color: #E65100; font-size: 22px;">-</b></p>
+        <hr>
+        
+        <div class="input-group">
+            <label>อีเมลสำหรับรับไฟล์ (กรอกอัตโนมัติ)</label>
+            <input type="email" id="customerEmail" class="input-field" readonly style="background: #f1f1f1; border-color: #ccc;">
+        </div>
+
+        <div class="input-group">
+            <label>เลขออเดอร์ (ถ้ามี)</label>
+            <input type="text" id="orderId" class="input-field" placeholder="เช่น ORD-12345">
+        </div>
+
+        <p style="font-size: 20px; margin-top: 25px;">ยอดชำระ: <b id="price-display" style="color: #E65100; font-size: 24px;">0 บาท</b></p>
+        
+        <button class="btn" id="submitBtn" onclick="processPayment()">ชำระเงินและสั่งซื้อ 🛒</button>
+        <button class="btn-back-secondary" onclick="switchScreen('home-screen')">⬅️ ย้อนกลับไปเลือกสินค้า</button>
+        
+        <div class="loader" id="loading"></div>
+    </div>
+
+    <div class="container" id="success-screen">
+        <h2 style="color: #10B981; font-size: 32px; font-weight: 800; margin-top: 0;">✅ สั่งซื้อสำเร็จ!</h2>
+        <p>ขอบคุณที่ใช้บริการ <b>Monkey Shop</b> 🐒</p>
+        <p style="color: #E65100; font-size: 16px;">ข้อมูลถูกส่งไปที่: <br><span id="displayFinalEmail" style="font-weight: 800; color: #5D3A1A;"></span></p>
+        
+        <div style="background-color: #FFEBEE; border-radius: 12px; padding: 10px; margin-top: 15px; border: 2px dashed #EF5350;">
+            <p style="font-size: 15px; color: #D32F2F; margin: 0;">⚠️ <b>สำคัญมาก:</b> กรุณาอ่านคำแนะนำด้านล่าง</p>
+        </div>
+        
+        <img src="618116867064070522.jpg" alt="ขั้นตอนการแจ้งปัญหา" class="support-img">
+        
+        <br>
+        <button class="back-link" onclick="switchScreen('home-screen')">กลับสู่หน้าหลักสินค้า</button>
+    </div>
+
+    <script>
+        let currentUserEmail = "";
+
+        function switchScreen(screenId) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('register-screen').style.display = 'none';
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('checkout-screen').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'none';
+            
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        function processLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+            
+            if (email === "" || pass === "") {
+                alert("กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วนครับ 🐒");
+                return;
+            }
+            loginSuccess(email, "สมาชิก");
+        }
+
+        function processRegister() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPassword').value;
+
+            if (name === "" || email === "" || pass === "") {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วนทุกช่องครับ 🐒");
+                return;
+            }
+            loginSuccess(email, name);
+        }
+
+        function loginSuccess(email, name) {
+            currentUserEmail = email; 
+            document.getElementById('displayUserName').innerText = name; 
+            document.getElementById('customerEmail').value = email; 
+            
+            document.getElementById('loginEmail').value = "";
+            document.getElementById('loginPassword').value = "";
+            document.getElementById('regName').value = "";
+            document.getElementById('regEmail').value = "";
+            document.getElementById('regPassword').value = "";
+
+            switchScreen('home-screen'); 
+        }
+
+        function processLogout() {
+            currentUserEmail = "";
+            switchScreen('login-screen');
+        }
+
+        function goToCheckout(productName, price) {
+            switchScreen('checkout-screen');
+            document.getElementById('product-name-display').innerText = productName;
+            document.getElementById('price-display').innerText = price + " บาท";
+            
+            document.getElementById('submitBtn').style.display = 'block';
+            document.querySelector('.btn-back-secondary').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function processPayment() {
+            document.getElementById('submitBtn').style.display = 'none';
+            document.querySelector('.btn-back-secondary').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            setTimeout(function() {
+                switchScreen('success-screen');
+                document.getElementById('displayFinalEmail').innerText = currentUserEmail;
+                document.getElementById('orderId').value = ""; 
+            }, 1500); 
+        }
+    </script>
+</body>
+</html>
